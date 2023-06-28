@@ -22,7 +22,7 @@ contract DeployDSC is Script {
             address wbtcUsdPriceFeed,
             address weth,
             address wbtc,
-            uint256 deployerKey
+
         ) = helperConfig.activeNetworkConfig();
         tokenAddresses = [weth, wbtc];
         priceFeedAddresses = [wethUsdPriceFeed, wbtcUsdPriceFeed];
