@@ -241,7 +241,7 @@ contract DSCEngine is ReentrancyGuard {
         uint256 debtToCover
     ) external moreThanZero(debtToCover) nonReentrant {
         uint256 startingUserHealthFactor = _healthFactor(user);
-        if (startingUserHealthFactor < MIN_HEALTH_FACTOR) {
+        if (startingUserHealthFactor >= MIN_HEALTH_FACTOR) {
             revert DSCEngine__HealthFactorOk();
         }
         uint256 tokenAmountFromDebtCovered = getTokenAmountFromUsd(
@@ -331,9 +331,17 @@ contract DSCEngine is ReentrancyGuard {
         (uint256 totalDscMinted, uint256 collateralValue) = _getAccountInfo(
             user
         );
-        uint256 collateralAdjustedThreshold = (collateralValue *
+        return _calculateHealthFactor(totalDscMinted, collateralValue);
+    }
+
+    function _calculateHealthFactor(
+        uint256 totalDscMinted,
+        uint256 collateralValueInUsd
+    ) internal pure returns (uint256) {
+        if (totalDscMinted == 0) return type(uint256).max;
+        uint256 collateralAdjustedForThreshold = (collateralValueInUsd *
             LIQUIDATION_THRESHOLD) / LIQUIDATION_PRECISION;
-        return (collateralAdjustedThreshold * PRECISION) / totalDscMinted;
+        return (collateralAdjustedForThreshold * PRECISION) / totalDscMinted;
     }
 
     function _revertIfHealthFactorIsBroken(address user) internal view {
@@ -394,5 +402,21 @@ contract DSCEngine is ReentrancyGuard {
 
     function getHealthFactor(address user) external view returns (uint256) {
         return _healthFactor(user);
+    }
+
+    function getLiquidationThreshold() external pure returns (uint256) {
+        return LIQUIDATION_THRESHOLD;
+    }
+
+    function getLiquidationPrecision() external pure returns (uint256) {
+        return LIQUIDATION_PRECISION;
+    }
+
+    function getLiquidationBonus() external pure returns (uint256) {
+        return LIQUIDATION_BONUS;
+    }
+
+    function getMinHealthFactor() external pure returns (uint256) {
+        return MIN_HEALTH_FACTOR;
     }
 }
