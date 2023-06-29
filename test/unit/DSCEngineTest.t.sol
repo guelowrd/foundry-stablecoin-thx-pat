@@ -197,52 +197,6 @@ contract DSCEngineTest is Test {
     ///////////////////////
     // Liquidation Tests //
     ///////////////////////
-    // This test needs it's own setup
-    // function testMustImproveHealthFactorOnLiquidation() public {
-    //     // Arrange - Setup
-    //     MockMoreDebtDSC mockDsc = new MockMoreDebtDSC(ethUsdPriceFeed);
-    //     tokenAddresses = [weth];
-    //     feedAddresses = [ethUsdPriceFeed];
-    //     address owner = msg.sender;
-    //     vm.prank(owner);
-    //     DSCEngine mockDsce = new DSCEngine(
-    //         tokenAddresses,
-    //         feedAddresses,
-    //         address(mockDsc)
-    //     );
-    //     mockDsc.transferOwnership(address(mockDsce));
-    //     // Arrange - User
-    //     vm.startPrank(user);
-    //     ERC20Mock(weth).approve(address(mockDsce), amountCollateral);
-    //     mockDsce.depositCollateralAndMintDsc(
-    //         weth,
-    //         amountCollateral,
-    //         amountToMint
-    //     );
-    //     vm.stopPrank();
-
-    //     // Arrange - Liquidator
-    //     collateralToCover = 1 ether;
-    //     ERC20Mock(weth).mint(liquidator, collateralToCover);
-
-    //     vm.startPrank(liquidator);
-    //     ERC20Mock(weth).approve(address(mockDsce), collateralToCover);
-    //     uint256 debtToCover = 10 ether;
-    //     mockDsce.depositCollateralAndMintDsc(
-    //         weth,
-    //         collateralToCover,
-    //         amountToMint
-    //     );
-    //     mockDsc.approve(address(mockDsce), debtToCover);
-    //     // Act
-    //     int256 ethUsdUpdatedPrice = 18e8; // 1 ETH = $18
-    //     MockV3Aggregator(ethUsdPriceFeed).updateAnswer(ethUsdUpdatedPrice);
-    //     // Act/Assert
-    //     vm.expectRevert(DSCEngine.DSCEngine__HealthFactorNotImproved.selector);
-    //     mockDsce.liquidate(weth, user, debtToCover);
-    //     vm.stopPrank();
-    // }
-
     function testCantLiquidateGoodHealthFactor()
         public
         depositedCollateralAndMintedDsc
@@ -305,39 +259,6 @@ contract DSCEngineTest is Test {
         assertEq(liquidatorWethBalance, hardCodedExpected);
         assertEq(liquidatorWethBalance, expectedWeth);
     }
-
-    // function testUserStillHasSomeEthAfterLiquidation() public liquidated {
-    //     // Get how much WETH the user lost
-    //     uint256 amountLiquidated = dscEngine.getTokenAmountFromUsd(
-    //         weth,
-    //         AMOUNT_DSC_MINTED
-    //     ) +
-    //         (dscEngine.getTokenAmountFromUsd(weth, AMOUNT_DSC_MINTED) /
-    //             dscEngine.getLiquidationBonus());
-
-    //     uint256 usdAmountLiquidated = dscEngine.getUsdValue(weth, amountLiquidated);
-    //     uint256 expectedUserCollateralValueInUsd = dscEngine.getUsdValue(
-    //         weth,
-    //         AMOUNT_COLLATERAL
-    //     ) - (usdAmountLiquidated);
-
-    //     (, uint256 userCollateralValueInUsd) = dscEngine.getAccountInformation(USER);
-    //     uint256 hardCodedExpectedValue = 70000000000000000020;
-    //     assertEq(userCollateralValueInUsd, expectedUserCollateralValueInUsd);
-    //     assertEq(userCollateralValueInUsd, hardCodedExpectedValue);
-    // }
-
-    // function testLiquidatorTakesOnUsersDebt() public liquidated {
-    //     (uint256 liquidatorDscMinted, ) = dscEngine.getAccountInformation(
-    //         liquidator
-    //     );
-    //     assertEq(liquidatorDscMinted, amountToMint);
-    // }
-
-    // function testUserHasNoMoreDebt() public liquidated {
-    //     (uint256 userDscMinted, ) = dscEngine.getAccountInformation(user);
-    //     assertEq(userDscMinted, 0);
-    // }
 
     // TODO: more tests to write, check `forge coverage --report debug` to see precisely which lines are untested.
 }
