@@ -15,7 +15,7 @@ contract Handler is Test {
     ERC20Mock weth;
     ERC20Mock wbtc;
 
-    uint256 MAX_DEPOSIT_SIZE = type(uint96).max;
+    uint256 MAX_DEPOSIT_SIZE = type(uint128).max;
 
     constructor(DSCEngine _dscEngine, DecentralizedStableCoin _dsc) {
         dscEngine = _dscEngine;
@@ -24,6 +24,26 @@ contract Handler is Test {
         address[] memory collateralTokens = dscEngine.getCollateralTokens();
         weth = ERC20Mock(collateralTokens[0]);
         wbtc = ERC20Mock(collateralTokens[1]);
+    }
+
+    // mint dsc
+    function mintDsc(uint256 amount) public {
+        amount = bound(amount, 1, MAX_DEPOSIT_SIZE);
+        (uint256 totalDscMinted, uint256 collateralValueInUsd) = dscEngine
+            .getAccountInfo(msg.sender);
+        int256 maxDscToMint = int256(collateralValueInUsd) /
+            2 -
+            int256(totalDscMinted);
+        if (maxDscToMint < 0) {
+            return;
+        }
+        amount = bound(amount, 0, uint256(maxDscToMint));
+        if (amount == 0) {
+            return;
+        }
+        vm.startPrank(msg.sender);
+        dscEngine.mintDsc(amount);
+        vm.stopPrank();
     }
 
     // redeem collateral
@@ -37,6 +57,25 @@ contract Handler is Test {
         collateral.mint(msg.sender, amountCollateral);
         collateral.approve(address(dscEngine), amountCollateral);
         dscEngine.depositCollateral(address(collateral), amountCollateral);
+        vm.stopPrank();
+    }
+
+    function redeemCollateral(
+        uint256 collateralSeed,
+        uint256 amountCollateral
+    ) public {
+        ERC20Mock collateral = _getCollateralFromSeed(collateralSeed);
+        vm.startPrank(msg.sender);
+        uint256 maxCollateralToRedeem = dscEngine.getCollateralBalanceOfUser(
+            msg.sender,
+            address(collateral)
+        );
+        amountCollateral = bound(amountCollateral, 0, maxCollateralToRedeem);
+        if (amountCollateral == 0) {
+            vm.stopPrank();
+            return;
+        }
+        dscEngine.redeemCollateral(address(collateral), amountCollateral);
         vm.stopPrank();
     }
 
