@@ -354,6 +354,13 @@ contract DSCEngine is ReentrancyGuard {
     ///////////////////////////////////////
     // Public & External View Functions //
     ///////////////////////////////////////
+    function calculateHealthFactor(
+        uint256 totalDscMinted,
+        uint256 collateralValueInUsd
+    ) external pure returns (uint256) {
+        return _calculateHealthFactor(totalDscMinted, collateralValueInUsd);
+    }
+
     function getAccountCollateralValueInUsd(
         address user
     ) public view returns (uint256 totalCollateralValueInUsd) {
@@ -418,5 +425,13 @@ contract DSCEngine is ReentrancyGuard {
 
     function getMinHealthFactor() external pure returns (uint256) {
         return MIN_HEALTH_FACTOR;
+    }
+
+    function getPrecision() external pure returns (uint256) {
+        return PRECISION;
+    }
+
+    function getAdditionalFeedPrecision() external pure returns (uint256) {
+        return ADDITIONAL_FEED_PRECISION;
     }
 }
