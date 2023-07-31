@@ -52,7 +52,21 @@ contract Invariants is StdInvariant, Test {
         );
         console.log("totalWethValue", totalWethValue);
         console.log("totalWbtcValue", totalWethValue);
-        console.log("totalSupply", totalWethValue);
+        console.log("totalSupply   ", totalWethValue);
+        console.log("timesMintIsCalled", handler.timesMintIsCalled());
         assert(totalWethValue + totalWbtcValue >= totalSupply);
+    }
+
+    function invariant_gettersShouldNotRevert() public view {
+        dscEngine.getAccountCollateralValueInUsd(msg.sender);
+        dscEngine.getAccountInfo(msg.sender);
+        dscEngine.getHealthFactor(msg.sender);
+        dscEngine.getLiquidationThreshold();
+        dscEngine.getLiquidationPrecision();
+        dscEngine.getLiquidationBonus();
+        dscEngine.getMinHealthFactor();
+        dscEngine.getPrecision();
+        dscEngine.getAdditionalFeedPrecision();
+        dscEngine.getCollateralTokens();
     }
 }
